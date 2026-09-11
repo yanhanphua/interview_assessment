@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../core/constants/api_constants.dart';
 import '../core/errors/api_exception.dart';
 import '../models/product_list_result.dart';
+import '../models/product.dart';
 
 class ProductApi {
   ProductApi({http.Client? client, String? baseUrl})
@@ -17,6 +18,11 @@ class ProductApi {
     );
     final json = await _getJson(uri) as Map<String, dynamic>;
     return ProductListResult.fromJson(json);
+  }
+  Future<Product> fetchProductById(int id) async{
+    final uri = Uri.parse('$_baseUrl${ApiConstants.productById(id)}');
+    final json = await _getJson(uri) as Map <String, dynamic>;
+    return Product.fromJson(json);
   }
   Future<dynamic> _getJson(Uri uri)async{
     try{
