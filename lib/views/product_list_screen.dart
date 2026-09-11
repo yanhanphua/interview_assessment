@@ -16,16 +16,50 @@ class ProductListScreen extends StatelessWidget {
         child:const _ProductListBody());
   }
 }
-class _ProductListBody extends StatelessWidget{
+class _ProductListBody extends StatefulWidget{
   const _ProductListBody();
   @override
-  Widget build(BuildContext context) {
+  State<_ProductListBody> createState() => _ProductListBodyState();
+
+}
+class _ProductListBodyState extends State<_ProductListBody>{
+  final _scrollController = ScrollController();
+  static const _loadMoreThreshold = 200.0;
+  @override
+  void initState(){
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+  void _onScroll(){
+    final position = _scrollController.position;
+    if(position.pixels >= position.maxScrollExtent - _loadMoreThreshold){
+      context.read<ProductListViewModel>().loadNextPage();
+    }
+  }
+  @override
+  void dispose(){
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context){
     final viewModel = context.watch<ProductListViewModel>();
     return Scaffold(
       appBar: AppBar(title: const Text('Products')),
       body: ListView.builder(
-        itemCount: viewModel.products.length,
-        itemBuilder: (context, index) => ProductCard(product: viewModel.products[index]),
+        controller: _scrollController,
+        itemCount: viewModel.products.length + (viewModel.isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= viewModel.products.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+        return ProductCard(product: viewModel.products[index]);
+        },
       ),
     );
   }
