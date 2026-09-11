@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interview_assessment/views/widgets/error_view.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../repositories/product_repository.dart';
@@ -6,34 +7,42 @@ import '../viewmodels/product_detail_view_model.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({super.key, required this.productId});
+
   final int productId;
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (context)=> ProductDetailViewModel(
-          repository:context.read<ProductRepository>(),
-          productId: productId,
-        )..loadProduct(),
-        child:const _ProductDetailBody()
+      create: (context) => ProductDetailViewModel(
+        repository: context.read<ProductRepository>(),
+        productId: productId,
+      )..loadProduct(),
+      child: const _ProductDetailBody(),
     );
   }
 }
+
 class _ProductDetailBody extends StatelessWidget {
   const _ProductDetailBody();
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProductDetailViewModel>();
-    final product = viewModel.product;
 
     return Scaffold(
-      appBar: AppBar(title: Text(product?.title ?? 'Product')),
-      body: product == null
-          ? const Center(child: CircularProgressIndicator())
-          : _ProductDetailContent(product: product),
+      appBar: AppBar(title: Text(viewModel.product?.title ?? 'Product')),
+      body: switch (viewModel.status) {
+        ProductDetailStatus.loading => const Center(child: CircularProgressIndicator()),
+        ProductDetailStatus.error => ErrorView(
+          message: viewModel.errorMessage ?? 'Something went wrong.',
+          onRetry: viewModel.loadProduct,
+        ),
+        ProductDetailStatus.success => _ProductDetailContent(product: viewModel.product!),
+      },
     );
   }
 }
+
 class _ProductDetailContent extends StatelessWidget {
   const _ProductDetailContent({required this.product});
 
