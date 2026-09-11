@@ -24,6 +24,16 @@ class ProductApi {
     final json = await _getJson(uri) as Map <String, dynamic>;
     return Product.fromJson(json);
   }
+  Future<List<Product>> searchProducts(String query) async {
+    final uri = Uri.parse('$_baseUrl${ApiConstants.productSearch}').replace(
+      queryParameters: {'q': query},
+    );
+    final json = await _getJson(uri) as Map<String, dynamic>;
+    final products = json['products'] as List<dynamic>? ?? const [];
+    return products
+        .map((product) => Product.fromJson(product as Map<String, dynamic>))
+        .toList();
+  }
   Future<dynamic> _getJson(Uri uri)async{
     try{
       final response = await _client.get(uri);

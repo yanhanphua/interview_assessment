@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../app/app_routes.dart';
 import '../repositories/product_repository.dart';
 import '../viewmodels/product_list_view_model.dart';
@@ -28,6 +27,7 @@ class _ProductListBody extends StatefulWidget {
 }
 class _ProductListBodyState extends State<_ProductListBody> {
   final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
 
   static const _loadMoreThreshold = 200.0;
   @override
@@ -35,6 +35,7 @@ class _ProductListBodyState extends State<_ProductListBody> {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
+
   void _onScroll() {
     final position = _scrollController.position;
     if (position.pixels >= position.maxScrollExtent - _loadMoreThreshold) {
@@ -46,6 +47,7 @@ class _ProductListBodyState extends State<_ProductListBody> {
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
+    _searchController.dispose();
     super.dispose();
   }
   @override
@@ -54,7 +56,24 @@ class _ProductListBodyState extends State<_ProductListBody> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Products')),
-      body: _buildBody(context, viewModel),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: viewModel.onSearchChanged,
+              decoration: const InputDecoration(
+                hintText: 'Search products…',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ),
+          Expanded(child: _buildBody(context, viewModel)),
+        ],
+      ),
     );
   }
   Widget _buildBody(BuildContext context, ProductListViewModel viewModel) {
@@ -96,3 +115,4 @@ class _ProductListBodyState extends State<_ProductListBody> {
     }
   }
 }
+

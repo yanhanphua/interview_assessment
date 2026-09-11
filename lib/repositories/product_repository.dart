@@ -8,4 +8,5 @@ class ProductRepository{
     return _api.fetchProducts(skip: skip, limit: limit);
   }
   Future<Product> getProduct(int id) => _api.fetchProductById(id);
+  Future<List<Product>> searchProducts(String query) => _api.searchProducts(query);
 }
