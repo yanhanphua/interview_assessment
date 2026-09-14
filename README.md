@@ -52,3 +52,10 @@ lib/
 
 - **No automated unit/widget tests.** Everything above was verified by manually running the app, not by an automated test suite.
 - **No pull-to-refresh.** The list only refreshes via the initial load, pagination, and the error screen's Retry button — there's no gesture to manually re-fetch the current view.
+
+## AI assistance
+
+I used AI assistance while building this project, specifically:
+
+- The idea of debouncing the search input (waiting ~400ms after typing stops before calling the search endpoint) came from AI advice.
+- Researching and settling on the MVVM architecture and folder structure (the `core`/`models`/`services`/`repositories`/`viewmodels`/`views`/`app` split) was also done with AI help.
